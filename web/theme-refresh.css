@@ -137,6 +137,8 @@ html[data-mode="light"] .reading-grid article,html[data-mode="light"] .feature-s
 html[data-mode="light"] .heatmap .hm-cell{background:color-mix(in srgb,var(--orange) calc(var(--level)*78%),var(--surface2))}
 html[data-mode="light"] .hbar-track,html[data-mode="light"] .template-line{background:var(--surface2)}
 html[data-mode="light"] .micro-stat{background:color-mix(in srgb,var(--surface2) 55%,var(--surface))}
+html[data-mode="light"] .data-table a,html[data-mode="light"] .ranked-row a,html[data-mode="light"] .chart-note a,html[data-mode="light"] .source-link,html[data-mode="light"] .word-sample a{color:var(--lime);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:color-mix(in srgb,var(--lime) 55%,transparent)}
+html[data-mode="light"] .data-table a:hover,html[data-mode="light"] .ranked-row a:hover,html[data-mode="light"] .chart-note a:hover,html[data-mode="light"] .source-link:hover,html[data-mode="light"] .word-sample a:hover{color:var(--orange);text-decoration-color:currentColor}
 html[data-mode="light"] footer{background:color-mix(in srgb,var(--surface) 72%,transparent);border-top-color:var(--line)}
 html[data-mode="light"] .theme-picker{box-shadow:0 12px 34px rgba(44,46,65,.16)}
 

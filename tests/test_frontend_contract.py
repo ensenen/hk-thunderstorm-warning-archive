@@ -39,6 +39,8 @@ class FrontendContractTest(unittest.TestCase):
         theme = self.text("theme-refresh.css")
         for colour in ("--violet", "--orange", "--cyan"):
             self.assertIn(colour, theme)
+        self.assertIn('html[data-mode="light"] .data-table a', theme)
+        self.assertIn('text-underline-offset:3px', theme)
         picker = self.text("theme.js")
         self.assertIn("prefers-color-scheme", picker)
         self.assertIn("localStorage", picker)
