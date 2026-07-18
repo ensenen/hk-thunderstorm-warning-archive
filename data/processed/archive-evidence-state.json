@@ -1,0 +1,139 @@
+{
+  "generated_at": "2026-07-19T03:42:51.704123+08:00",
+  "english_index_probes": {
+    "finding": "繁體中文及英文政府新聞公報索引均存在，但兩種語言索引都沒有雷暴警告連結。",
+    "probes": [
+      {
+        "date": "1998-05-02",
+        "source_url": "https://www.info.gov.hk/gia/wr/199805/02.htm",
+        "source_file": "data/raw/info-gov-hk/english-index-probes/19980502.html",
+        "sha256": "68f82fff94a5a75b778c5aa2173688ec437f692d258953c6c3fb10a8b8138aa8",
+        "thunderstorm_warning_links": 0
+      },
+      {
+        "date": "1998-05-03",
+        "source_url": "https://www.info.gov.hk/gia/wr/199805/03.htm",
+        "source_file": "data/raw/info-gov-hk/english-index-probes/19980503.html",
+        "sha256": "a7d5bc76c871a38a7793864e4de35b805ad542844e10f215f9aa73dff5a4dc38",
+        "thunderstorm_warning_links": 0
+      },
+      {
+        "date": "1998-05-04",
+        "source_url": "https://www.info.gov.hk/gia/wr/199805/04.htm",
+        "source_file": "data/raw/info-gov-hk/english-index-probes/19980504.html",
+        "sha256": "8507d435d7a9f829bd8c84a01272357278822fea7cfcfad8bf10b0d721664749",
+        "thunderstorm_warning_links": 0
+      },
+      {
+        "date": "2000-08-17",
+        "source_url": "https://www.info.gov.hk/gia/wr/200008/17.htm",
+        "source_file": "data/raw/info-gov-hk/english-index-probes/20000817.html",
+        "sha256": "ff5df31fe2bfbe137d760d6fa60f479510e4042c2c70b8b17ebe50b84718b8de",
+        "thunderstorm_warning_links": 0
+      },
+      {
+        "date": "2002-07-07",
+        "source_url": "https://www.info.gov.hk/gia/wr/200207/07.htm",
+        "source_file": "data/raw/info-gov-hk/english-index-probes/20020707.html",
+        "sha256": "9659230d2637a3bcfbec5e1be8ca0f623d143f62332c195652d92497271cac95",
+        "thunderstorm_warning_links": 0
+      }
+    ]
+  },
+  "corroborating_manifests": [
+    {
+      "corroborates_event_source_url": "https://www.info.gov.hk/gia/wr/200007/17/0717169.htm",
+      "finding": "四份每小時天氣報告確認雷暴警告於2000-07-17 13:05至14:05生效，但HKO thunder.dat沒有該系列。",
+      "sources": [
+        {
+          "source_url": "https://www.info.gov.hk/gia/wr/200007/17/0717166.htm",
+          "source_file": "data/raw/info-gov-hk/corroborating/2000/07/17/0717166.htm",
+          "sha256": "b84a76612f3832a7e0726e27091d5be8272ae66c96351654f579cbdbaa3cdf8b",
+          "report_at": "2000-07-17T13:02:00+08:00",
+          "observation": "雷暴警告尚未出現"
+        },
+        {
+          "source_url": "https://www.info.gov.hk/gia/wr/200007/17/0717170.htm",
+          "source_file": "data/raw/info-gov-hk/corroborating/2000/07/17/0717170.htm",
+          "sha256": "890d478a35e907ac36625b9889b792a3712b05de88fc813dfc8ce2eaa1bd8534",
+          "report_at": "2000-07-17T13:08:00+08:00",
+          "observation": "明確寫13:05發出雷暴警告，有效至14:05"
+        },
+        {
+          "source_url": "https://www.info.gov.hk/gia/wr/200007/17/0717180.htm",
+          "source_file": "data/raw/info-gov-hk/corroborating/2000/07/17/0717180.htm",
+          "sha256": "2dc8f5102b16de9c9a2d8070e464120cc54b923b5d178044a2e5c2df55af1bd0",
+          "report_at": "2000-07-17T14:02:00+08:00",
+          "observation": "明確寫雷暴警告現正生效，有效至14:05"
+        },
+        {
+          "source_url": "https://www.info.gov.hk/gia/wr/200007/17/0717182.htm",
+          "source_file": "data/raw/info-gov-hk/corroborating/2000/07/17/0717182.htm",
+          "sha256": "85624a14a63b6f43e228e0d45acee2f5e924b96b057a46daf8d15b75d9069705",
+          "report_at": "2000-07-17T14:05:00+08:00",
+          "observation": "雷暴警告文字消失，與14:05過期一致"
+        }
+      ]
+    },
+    {
+      "series": [
+        {
+          "id": "WTS-19980502-1550",
+          "started_at": "1998-05-02T15:50:00+08:00",
+          "ended_at": "1998-05-03T06:00:00+08:00",
+          "hourly_reports": []
+        },
+        {
+          "id": "WTS-19980503-1120",
+          "started_at": "1998-05-03T11:20:00+08:00",
+          "ended_at": "1998-05-03T13:20:00+08:00",
+          "hourly_reports": []
+        },
+        {
+          "id": "WTS-19980504-0710",
+          "started_at": "1998-05-04T07:10:00+08:00",
+          "ended_at": "1998-05-04T10:10:00+08:00",
+          "hourly_reports": []
+        },
+        {
+          "id": "WTS-20000817-1455",
+          "started_at": "2000-08-17T14:55:00+08:00",
+          "ended_at": "2000-08-17T15:55:00+08:00",
+          "hourly_reports": [
+            {
+              "source_url": "https://www.info.gov.hk/gia/wr/200008/17/0817134.htm",
+              "source_file": "data/raw/info-gov-hk/corroborating/missing-series-hourly/2000/08/17/0817134.htm",
+              "sha256": "cb5c0f64d016c8dcef89fc7344e16b7a7095a96d26d6ba2daf929371cf078a80",
+              "report_at": "2000-08-17T14:02:00+08:00",
+              "mentions_thunderstorm_warning": false,
+              "attention_text": ""
+            },
+            {
+              "source_url": "https://www.info.gov.hk/gia/wr/200008/17/0817158.htm",
+              "source_file": "data/raw/info-gov-hk/corroborating/missing-series-hourly/2000/08/17/0817158.htm",
+              "sha256": "d67a042bcb3d8ef5720d04c1ff4d9d17e2f37b2130adf4dd249cdfec96c5a050",
+              "report_at": "2000-08-17T16:02:00+08:00",
+              "mentions_thunderstorm_warning": false,
+              "attention_text": ""
+            },
+            {
+              "source_url": "https://www.info.gov.hk/gia/wr/200008/17/0817160.htm",
+              "source_file": "data/raw/info-gov-hk/corroborating/missing-series-hourly/2000/08/17/0817160.htm",
+              "sha256": "e9b6c4f7fc89043f0e6bcad64c63dcfdd5203a3bfc5d10c9f2b7e0d00540afa6",
+              "report_at": "2000-08-17T16:05:00+08:00",
+              "mentions_thunderstorm_warning": false,
+              "attention_text": ""
+            }
+          ]
+        },
+        {
+          "id": "WTS-20020707-1140",
+          "started_at": "2002-07-07T11:40:00+08:00",
+          "ended_at": "2002-07-07T15:30:00+08:00",
+          "hourly_reports": []
+        }
+      ],
+      "all_downloaded_reports": 45
+    }
+  ]
+}

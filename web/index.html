@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080713">
+  <title>雷暴檔案 · 香港雷暴警告互動資料庫</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/evolution.css">
+  <link rel="stylesheet" href="/theme-refresh.css">
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="hero">
+    <nav>
+      <a class="brand" href="/"><span class="brand-mark">ϟ</span><span>雷暴檔案</span></a>
+      <div class="nav-links"><a class="active" href="/">警告紀錄</a><a href="/evolution.html">用字演化</a><a href="/analysis.html">分析</a></div>
+      <div class="nav-meta"><span class="pulse"></span><span id="coverageRange">1967—</span> · HKO / 政府新聞公報</div>
+    </nav>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">HONG KONG THUNDERSTORM WARNING ARCHIVE</p>
+        <h1>每一次發出、延長，<br><em>都有時間線。</em></h1>
+        <p class="intro">由官方起訖紀錄到歷年原始天氣稿，探索香港雷暴警告近六十年變化。</p>
+      </div>
+      <div class="radar" aria-hidden="true">
+        <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
+        <div class="radar-sweep"></div><div class="storm-dot d1"></div><div class="storm-dot d2"></div><div class="storm-dot d3"></div>
+        <span>22.3°N<br>114.2°E</span>
+      </div>
+    </div>
+    <section id="stats" class="stats" aria-label="資料統計"></section>
+  </header>
+
+  <main>
+    <section class="year-section panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">ANNUAL SIGNAL</p><h2>年度警告密度</h2></div>
+        <p>點選年份即可篩選。亮色部分代表有完整天氣稿。</p>
+      </div>
+      <div id="yearChart" class="year-chart" aria-label="按年警告數目圖表"></div>
+    </section>
+
+    <section class="archive-section">
+      <div class="section-heading archive-heading">
+        <div><p class="eyebrow">WARNING LOG</p><h2>警告紀錄</h2></div>
+        <div id="resultCount" class="result-count"></div>
+      </div>
+
+      <form id="filters" class="filters panel">
+        <label><span>年份</span><select id="yearFilter"><option value="">全部年份</option></select></label>
+        <label><span>終結方式</span><select id="terminalFilter"><option value="">全部結果</option><option value="expired">自然過期</option><option value="cancelled_early">提早取消</option><option value="unknown">無法判斷</option></select></label>
+        <label><span>資料完整度</span><select id="statusFilter"><option value="">全部資料</option><option value="available">有天氣稿</option><option value="not_archived">只有官方紀錄</option><option value="not_downloaded">尚未下載</option><option value="archive_incomplete">Archive缺漏</option></select></label>
+        <label class="sort-label"><span>排序</span><select id="sortFilter"><option value="newest">最新警告先</option><option value="oldest">最舊警告先</option><option value="duration_desc">有效時間最長先</option><option value="duration_asc">有效時間最短先</option><option value="events_desc">事件最多先</option><option value="cancellation_margin_desc">提早取消幅度最大先</option></select></label>
+        <label class="search-label"><span>搜尋原文</span><input id="searchInput" type="search" placeholder="大嶼山、冰雹、90公里…"></label>
+        <button type="submit">套用篩選 <span>↗</span></button>
+      </form>
+
+      <div id="activeFilters" class="active-filters"></div>
+      <div id="seriesList" class="series-list" aria-live="polite"></div>
+      <div id="pagination" class="pagination"></div>
+    </section>
+  </main>
+
+  <dialog id="detailDialog" class="detail-dialog">
+    <div class="dialog-shell">
+      <button id="closeDialog" class="dialog-close" aria-label="關閉">×</button>
+      <div id="detailContent"></div>
+    </div>
+  </dialog>
+
+  <footer><span>資料來源：香港天文台及政府新聞公報</span><span id="lastUpdated">正在讀取資料更新時間…</span><span>原始資料、解析結果與不確定性均保留</span></footer>
+  <script src="/app.js" defer></script>
+  <script src="/theme.js" defer></script>
+</body>
+</html>

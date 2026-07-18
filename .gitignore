@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+data/raw/
+data/processed/
+data/*.sqlite3
+dist/
+!data/sample/
+
+# Small reproducibility state required by a fresh scheduled runner. Add the
+# initial versions with `git add -f` when publishing the repository.
+!data/processed/
+data/processed/*
+!data/processed/bulletin-events.jsonl
+!data/processed/daily-update-state.json
+!data/processed/archive-date-status.json
+!data/processed/archive-evidence-state.json
+!data/processed/analysis.json

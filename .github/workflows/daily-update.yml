@@ -1,0 +1,46 @@
+name: Daily data update
+
+on:
+  schedule:
+    - cron: "25 18 * * *" # 02:25 Asia/Hong_Kong
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-data-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh and validate
+        run: |
+          python scripts/update_daily.py
+          python -m unittest discover -s tests -v
+      - name: Build release archive
+        run: |
+          tar -czf hk-thunderstorm-warnings-open-data.tar.gz -C dist open-data
+          tar -czf recent-raw-html.tar.gz data/raw/info-gov-hk data/raw/weather-gov-hk
+          echo "RELEASE_TAG=data-$(date -u +%F)" >> "$GITHUB_ENV"
+      - name: Save incremental parser state
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/processed/bulletin-events.jsonl data/processed/daily-update-state.json data/processed/archive-date-status.json data/processed/archive-evidence-state.json data/processed/analysis.json
+          git diff --cached --quiet || git commit -m "data: daily refresh"
+          git push
+      - name: Publish dated data and raw-source snapshot
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Open Data snapshot ${{ env.RELEASE_TAG }}
+          files: |
+            hk-thunderstorm-warnings-open-data.tar.gz
+            recent-raw-html.tar.gz
