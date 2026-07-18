@@ -39,7 +39,10 @@ class FrontendContractTest(unittest.TestCase):
         picker = self.text("theme.js")
         self.assertIn("prefers-color-scheme", picker)
         self.assertIn("localStorage", picker)
-        self.assertIn("琥珀天氣稿 · 淺色", picker)
+        self.assertIn("['midnight','深色']", picker)
+        self.assertIn("['paper','淺色']", picker)
+        self.assertNotIn("雷達綠光", picker)
+        self.assertNotIn("跟隨系統", picker)
 
     def test_analysis_omits_low_value_cross_warning_panel(self):
         page = self.text("analysis.html")
