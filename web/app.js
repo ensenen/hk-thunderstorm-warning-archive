@@ -5,6 +5,18 @@ const eventNames={issued:'發出',extended:'延長',updated:'內容更新',cance
 const terminalNames={expired:'自然過期',cancelled_early:'提早取消',unknown:'無法判斷'};
 const statusNames={available:'有天氣稿',not_archived:'只有官方紀錄',not_downloaded:'尚未下載',archive_incomplete:'Archive缺漏'};
 const sortNames={newest:'最新警告先',oldest:'最舊警告先',duration_desc:'有效時間最長先',duration_asc:'有效時間最短先',events_desc:'事件最多先',cancellation_margin_desc:'提早取消幅度最大先'};
+const parseWarningNames={
+  'explicit-date midnight 12 is date-boundary ambiguous':'原文使用「午夜12時」，所屬日期可能有歧義',
+  'original warning start omitted from extension bulletin':'延長稿沒有重述原警告的發出時間',
+  'gust update does not repeat warning start or valid-until time':'陣風更新沒有重述警告發出時間或有效時間',
+  'effective-until timestamp not found':'未能從原文辨認警告有效至何時',
+  'event wording not recognised':'未能辨認原文所述的警告事件類型',
+};
+function parseWarningName(message){
+  const typo=message.match(/^source time typo normalised: (.+) -> (.+)$/);
+  if(typo)return `原文時間疑有筆誤，解析時已由「${typo[1]}」修正為「${typo[2]}」`;
+  return parseWarningNames[message]||message;
+}
 const HK_TIME_ZONE='Asia/Hong_Kong';
 const dateFmt=v=>new Intl.DateTimeFormat('zh-HK',{year:'numeric',month:'long',day:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(v));
 const shortDateFmt=v=>new Intl.DateTimeFormat('zh-HK',{month:'numeric',day:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(v));
@@ -90,7 +102,7 @@ async function openDetail(id,updateUrl=false){
   $('#detailContent').innerHTML=`<div class="detail-header"><p class="eyebrow">${s.id}</p><h2>${dateFmt(s.started_at)}<br>雷暴警告</h2><div class="detail-summary"><span>${dateTimeFmt(s.started_at)} → ${dateTimeFmt(s.ended_at)}</span><span>${duration(s.duration_minutes)}</span><span>${terminalNames[s.terminal_type]}</span><span>${statusNames[s.weather_bulletin_status]}</span></div>${historicTimeNote(s)}${note}</div>
   <div class="timeline">${s.events.length?s.events.map(eventHtml).join(''):`<div class="empty">呢組舊警告只有官方起訖紀錄，沒有天氣稿時間線。<br><a class="source-link" target="_blank" rel="noopener" href="${s.official_source_url}">查看官方資料來源 ↗</a></div>`}</div>`;
 }
-function eventHtml(e){const until=e.valid_until?`新有效時間 ${dateTimeFmt(e.valid_until)}`:' ';return `<article class="event"><div class="event-time"><small>${shortDateFmt(e.event_at)}</small>${timeFmt(e.event_at)}</div><div class="event-dot"></div><div class="event-content"><h3>${eventNames[e.event_type]||e.event_type}</h3><div class="event-meta">${until}${e.is_correction?' · 更正稿':''}</div><p>${escapeHtml(e.body_text)}</p>${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
+function eventHtml(e){const until=e.valid_until?`新有效時間 ${dateTimeFmt(e.valid_until)}`:' ';return `<article class="event"><div class="event-time"><small>${shortDateFmt(e.event_at)}</small>${timeFmt(e.event_at)}</div><div class="event-dot"></div><div class="event-content"><h3>${eventNames[e.event_type]||e.event_type}</h3><div class="event-meta">${until}${e.is_correction?' · 更正稿':''}</div><p>${escapeHtml(e.body_text)}</p>${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.map(parseWarningName).join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
 function closeDetail(){const d=$('#detailDialog');if(d.open)d.close();if(locationSeriesId())history.replaceState({},'',window.THUNDER_STATIC?location.pathname:'/');}
 function bind(){
   $('#filters').onsubmit=e=>{e.preventDefault();state.year=$('#yearFilter').value;state.terminal=$('#terminalFilter').value;state.status=$('#statusFilter').value;state.sort=$('#sortFilter').value;state.q=$('#searchInput').value.trim();state.directId='';state.directOpened=false;state.page=1;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));loadAll()};

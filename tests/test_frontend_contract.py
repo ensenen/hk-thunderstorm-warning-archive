@@ -17,6 +17,9 @@ class FrontendContractTest(unittest.TestCase):
         self.assertNotIn("state={year:'2026'", app)
         self.assertIn("香港夏令時間（UTC+9）", app)
         self.assertIn("香港標準時間（UTC+8）", app)
+        self.assertIn("原文使用「午夜12時」，所屬日期可能有歧義", app)
+        self.assertIn("延長稿沒有重述原警告的發出時間", app)
+        self.assertIn("原文時間疑有筆誤", app)
 
     def test_analysis_ranges_are_data_driven(self):
         analysis = self.text("analysis.js")
