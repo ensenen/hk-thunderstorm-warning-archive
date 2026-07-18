@@ -3,3 +3,4 @@
 
 .event-time small{display:block;color:var(--muted);font-size:9px;margin-bottom:4px}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 .hm-cell{border:0;padding:0;cursor:help}.feature-stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.subheading{margin-top:30px!important}.chart-note{line-height:1.7}.spark i:focus,.hm-cell:focus{outline:2px solid var(--lime);outline-offset:1px}
+.table-head{border-top:0!important;border-bottom:1px solid var(--line);padding-bottom:12px!important;color:var(--text);font-weight:700}.table-head strong,.table-head span{color:var(--text)!important;font:700 10px var(--mono)!important;letter-spacing:.04em}.table-head:hover{background:transparent!important}

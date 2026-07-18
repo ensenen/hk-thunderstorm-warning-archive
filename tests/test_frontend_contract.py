@@ -50,6 +50,8 @@ class FrontendContractTest(unittest.TestCase):
         self.assertNotIn("同時生效嘅其他警告", page)
         self.assertNotIn("overlapStats", page)
         self.assertIn("有天氣稿可分析", script)
+        self.assertIn("天氣稿刊登時間", script)
+        self.assertIn("warningHref(id)", script)
 
     def test_static_adapter_supports_search_sort_and_details(self):
         adapter = self.text("static-api.js")
