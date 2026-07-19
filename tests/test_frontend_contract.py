@@ -45,6 +45,7 @@ class FrontendContractTest(unittest.TestCase):
         self.assertNotIn('color:#171129', theme)
         self.assertIn('.detail-dialog .event-time{grid-column:2;grid-row:1', theme)
         self.assertIn('.detail-dialog .event-content{grid-column:2;grid-row:2', theme)
+        self.assertIn('.detail-dialog{width:100%;max-width:none;height:100dvh', theme)
         picker = self.text("theme.js")
         self.assertIn("prefers-color-scheme", picker)
         self.assertIn("localStorage", picker)
