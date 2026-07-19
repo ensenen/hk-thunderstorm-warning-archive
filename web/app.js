@@ -22,6 +22,7 @@ const dateFmt=v=>new Intl.DateTimeFormat('zh-HK',{year:'numeric',month:'long',da
 const eventDateFmt=v=>new Intl.DateTimeFormat('zh-HK',{month:'long',day:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(v));
 const timeFmt=v=>new Intl.DateTimeFormat('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:HK_TIME_ZONE}).format(new Date(v));
 const dateTimeFmt=v=>`${dateFmt(v)} ${timeFmt(v)}`;
+const eventDateTimeFmt=(v,reference)=>{const year=value=>new Intl.DateTimeFormat('en',{year:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(value));return `${year(v)!==year(reference)?dateFmt(v):eventDateFmt(v)} ${timeFmt(v)}`};
 const timeStandard=offset=>offset==='+0900'?'香港夏令時間（UTC+9）':'香港標準時間（UTC+8）';
 const usesSummerTime=s=>s.start_utc_offset==='+0900'||s.end_utc_offset==='+0900';
 function historicTimeBadge(s){
@@ -137,9 +138,9 @@ async function openDetail(id,updateUrl=false){
   $('#mobileDetailTitle').textContent=s.id;
   const note=s.weather_bulletin_note?`<div class="detail-note">${escapeHtml(s.weather_bulletin_note)}</div>`:'';
   $('#detailContent').innerHTML=`<div class="detail-header"><p class="eyebrow">${s.id}</p><h2>${dateFmt(s.started_at)}<br>雷暴警告</h2><div class="detail-summary"><span>${dateTimeFmt(s.started_at)} → ${dateTimeFmt(s.ended_at)}</span><span>${duration(s.duration_minutes)}</span><span>${terminalNames[s.terminal_type]}</span><span>${statusNames[s.weather_bulletin_status]}</span></div>${historicTimeNote(s)}${note}</div>
-  <div class="timeline">${s.events.length?s.events.map(eventHtml).join(''):`<div class="empty">呢組舊警告只有官方起訖紀錄，沒有天氣稿時間線。<br><a class="source-link" target="_blank" rel="noopener" href="${s.official_source_url}">查看官方資料來源 ↗</a></div>`}</div>`;
+  <div class="timeline">${s.events.length?`<p class="timeline-guide">以下日期時間為政府天氣稿發出時間</p>${s.events.map(eventHtml).join('')}`:`<div class="empty">呢組舊警告只有官方起訖紀錄，沒有天氣稿時間線。<br><a class="source-link" target="_blank" rel="noopener" href="${s.official_source_url}">查看官方資料來源 ↗</a></div>`}</div>`;
 }
-function eventHtml(e){const until=e.valid_until?`<span>新有效時間：${dateTimeFmt(e.valid_until)}</span>`:'';return `<article class="event"><div class="event-dot"></div><div class="event-content"><header class="event-heading"><div class="event-issued"><span>天氣稿發出時間</span><time datetime="${e.event_at}">${eventDateFmt(e.event_at)} ${timeFmt(e.event_at)}</time></div><h3>${eventNames[e.event_type]||e.event_type}</h3><div class="event-valid">${until}${e.is_correction?'<span>更正稿</span>':''}</div></header><p>${escapeHtml(e.body_text)}</p>${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.map(parseWarningName).join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
+function eventHtml(e){const until=e.valid_until?`<span>新有效時間：${eventDateTimeFmt(e.valid_until,e.event_at)}</span>`:'',collapsible=(e.body_text||'').length>140;return `<article class="event"><div class="event-dot"></div><div class="event-content"><header class="event-heading"><h3>${eventNames[e.event_type]||e.event_type}</h3><time class="event-issued" datetime="${e.event_at}">${eventDateFmt(e.event_at)} ${timeFmt(e.event_at)}</time><div class="event-valid">${until}${e.is_correction?'<span>更正稿</span>':''}</div></header><p class="event-body ${collapsible?'is-collapsed':''}">${escapeHtml(e.body_text)}</p>${collapsible?'<button class="event-body-toggle" type="button" data-event-body-toggle aria-expanded="false">展開完整內容</button>':''}${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.map(parseWarningName).join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
 function closeDetail(){const d=$('#detailDialog');if(d.open)d.close();if(locationSeriesId())history.replaceState({},'',window.THUNDER_STATIC?location.pathname:'/');}
 function bind(){
   $('#filters').onsubmit=e=>{e.preventDefault();state.year=$('#yearFilter').value;state.terminal=$('#terminalFilter').value;state.status=$('#statusFilter').value;state.sort=$('#sortFilter').value;state.q=$('#searchInput').value.trim();state.directId='';state.directOpened=false;state.page=1;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));renderScope();updateYearSelection();renderChips();scrollYearToActive();setFilterDrawer(false);loadAll()};
@@ -149,6 +150,7 @@ function bind(){
   $('#closeDialog').onclick=closeDetail;
   $('#mobileCloseDialog').onclick=closeDetail;
   $('#detailDialog').onclick=e=>{if(e.target===$('#detailDialog'))closeDetail()};
+  $('#detailContent').onclick=e=>{const button=e.target.closest('[data-event-body-toggle]');if(!button)return;const body=button.previousElementSibling,expanded=button.getAttribute('aria-expanded')==='true';body.classList.toggle('is-collapsed',expanded);button.setAttribute('aria-expanded',String(!expanded));button.textContent=expanded?'展開完整內容':'收起完整內容'};
   $('#detailDialog').oncancel=e=>{e.preventDefault();closeDetail()};
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#filters').classList.contains('drawer-open')){e.preventDefault();setFilterDrawer(false)}});
   const drawerMedia=matchMedia('(max-width:600px)');drawerMedia.addEventListener?.('change',()=>setFilterDrawer(false));setFilterDrawer(false);
