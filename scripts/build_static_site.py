@@ -65,6 +65,7 @@ def make_pages_portable() -> None:
     boot = '<script>window.THUNDER_STATIC=true</script><script src="static-api.js"></script>'
     for path in OUTPUT.glob("*.html"):
         html = path.read_text(encoding="utf-8")
+        html = html.replace('href="/"', 'href="index.html"')
         html = html.replace('href="/', 'href="').replace('src="/', 'src="')
         html = html.replace("</body>", f"{boot}</body>")
         path.write_text(html, encoding="utf-8")

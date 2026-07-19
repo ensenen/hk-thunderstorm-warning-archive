@@ -64,6 +64,8 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("cancellation_margin_desc", adapter)
         self.assertIn("dataRoot", adapter)
         self.assertIn("THUNDER_STATIC", self.text("app.js"))
+        builder = (ROOT / "scripts" / "build_static_site.py").read_text(encoding="utf-8")
+        self.assertIn("'href=\"/\"', 'href=\"index.html\"'", builder)
 
     def test_archive_status_baseline_is_substantial(self):
         payload = json.loads((ROOT / "data/processed/archive-date-status.json").read_text(encoding="utf-8"))
