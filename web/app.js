@@ -131,7 +131,7 @@ async function openDetail(id,updateUrl=false){
   const d=$('#detailDialog');$('#detailContent').innerHTML='<div class="loading">正在建立時間線…</div>';if(!d.open)d.showModal();
   if(updateUrl)history.pushState({seriesId:id},'',detailLocation(id));
   const s=await get(`/api/series/${encodeURIComponent(id)}`);
-  $('#mobileDetailTitle').textContent=`${dateFmt(s.started_at)}雷暴警告`;
+  $('#mobileDetailTitle').textContent=s.id;
   const note=s.weather_bulletin_note?`<div class="detail-note">${escapeHtml(s.weather_bulletin_note)}</div>`:'';
   $('#detailContent').innerHTML=`<div class="detail-header"><p class="eyebrow">${s.id}</p><h2>${dateFmt(s.started_at)}<br>雷暴警告</h2><div class="detail-summary"><span>${dateTimeFmt(s.started_at)} → ${dateTimeFmt(s.ended_at)}</span><span>${duration(s.duration_minutes)}</span><span>${terminalNames[s.terminal_type]}</span><span>${statusNames[s.weather_bulletin_status]}</span></div>${historicTimeNote(s)}${note}</div>
   <div class="timeline">${s.events.length?s.events.map(eventHtml).join(''):`<div class="empty">呢組舊警告只有官方起訖紀錄，沒有天氣稿時間線。<br><a class="source-link" target="_blank" rel="noopener" href="${s.official_source_url}">查看官方資料來源 ↗</a></div>`}</div>`;
