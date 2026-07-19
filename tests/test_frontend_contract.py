@@ -20,6 +20,9 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("原文使用「午夜12時」，所屬日期可能有歧義", app)
         self.assertIn("延長稿沒有重述原警告的發出時間", app)
         self.assertIn("原文時間疑有筆誤", app)
+        self.assertIn("month:'long',day:'numeric'", app)
+        self.assertIn("天氣稿發出時間", app)
+        self.assertIn('<time datetime="${e.event_at}">', app)
 
     def test_analysis_ranges_are_data_driven(self):
         analysis = self.text("analysis.js")

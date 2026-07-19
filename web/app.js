@@ -19,7 +19,7 @@ function parseWarningName(message){
 }
 const HK_TIME_ZONE='Asia/Hong_Kong';
 const dateFmt=v=>new Intl.DateTimeFormat('zh-HK',{year:'numeric',month:'long',day:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(v));
-const shortDateFmt=v=>new Intl.DateTimeFormat('zh-HK',{month:'numeric',day:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(v));
+const eventDateFmt=v=>new Intl.DateTimeFormat('zh-HK',{month:'long',day:'numeric',timeZone:HK_TIME_ZONE}).format(new Date(v));
 const timeFmt=v=>new Intl.DateTimeFormat('zh-HK',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:HK_TIME_ZONE}).format(new Date(v));
 const dateTimeFmt=v=>`${dateFmt(v)} ${timeFmt(v)}`;
 const timeStandard=offset=>offset==='+0900'?'香港夏令時間（UTC+9）':'香港標準時間（UTC+8）';
@@ -136,7 +136,7 @@ async function openDetail(id,updateUrl=false){
   $('#detailContent').innerHTML=`<div class="detail-header"><p class="eyebrow">${s.id}</p><h2>${dateFmt(s.started_at)}<br>雷暴警告</h2><div class="detail-summary"><span>${dateTimeFmt(s.started_at)} → ${dateTimeFmt(s.ended_at)}</span><span>${duration(s.duration_minutes)}</span><span>${terminalNames[s.terminal_type]}</span><span>${statusNames[s.weather_bulletin_status]}</span></div>${historicTimeNote(s)}${note}</div>
   <div class="timeline">${s.events.length?s.events.map(eventHtml).join(''):`<div class="empty">呢組舊警告只有官方起訖紀錄，沒有天氣稿時間線。<br><a class="source-link" target="_blank" rel="noopener" href="${s.official_source_url}">查看官方資料來源 ↗</a></div>`}</div>`;
 }
-function eventHtml(e){const until=e.valid_until?`新有效時間 ${dateTimeFmt(e.valid_until)}`:' ';return `<article class="event"><div class="event-time"><small>${shortDateFmt(e.event_at)}</small>${timeFmt(e.event_at)}</div><div class="event-dot"></div><div class="event-content"><h3>${eventNames[e.event_type]||e.event_type}</h3><div class="event-meta">${until}${e.is_correction?' · 更正稿':''}</div><p>${escapeHtml(e.body_text)}</p>${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.map(parseWarningName).join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
+function eventHtml(e){const until=e.valid_until?`新有效時間 ${dateTimeFmt(e.valid_until)}`:' ';return `<article class="event"><div class="event-time"><span>天氣稿發出時間</span><time datetime="${e.event_at}">${eventDateFmt(e.event_at)} ${timeFmt(e.event_at)}</time></div><div class="event-dot"></div><div class="event-content"><h3>${eventNames[e.event_type]||e.event_type}</h3><div class="event-meta">${until}${e.is_correction?' · 更正稿':''}</div><p>${escapeHtml(e.body_text)}</p>${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.map(parseWarningName).join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
 function closeDetail(){const d=$('#detailDialog');if(d.open)d.close();if(locationSeriesId())history.replaceState({},'',window.THUNDER_STATIC?location.pathname:'/');}
 function bind(){
   $('#filters').onsubmit=e=>{e.preventDefault();state.year=$('#yearFilter').value;state.terminal=$('#terminalFilter').value;state.status=$('#statusFilter').value;state.sort=$('#sortFilter').value;state.q=$('#searchInput').value.trim();state.directId='';state.directOpened=false;state.page=1;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));renderScope();updateYearSelection();renderChips();scrollYearToActive();setFilterDrawer(false);loadAll()};
