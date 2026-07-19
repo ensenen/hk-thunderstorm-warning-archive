@@ -55,6 +55,8 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn(".filter-drawer>.terminal-label,.filter-drawer>.status-label,.filter-drawer>.filter-apply{grid-area:auto}", theme)
         self.assertIn(".year-section .section-heading>p{display:block", theme)
         self.assertIn(".mobile-detail-toolbar{position:sticky", theme)
+        self.assertIn("background:var(--surface);box-shadow:", theme)
+        self.assertIn(".mobile-detail-toolbar+#detailContent .detail-header{padding-top:24px}", theme)
         self.assertIn("都盡可能還原成時間線", page)
         self.assertIn('aria-label="第一頁"', app)
         self.assertIn('aria-label="最後一頁，第 ${d.pages} 頁"', app)
