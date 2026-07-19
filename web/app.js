@@ -114,7 +114,7 @@ function renderChips(){
   const labels=[];if(state.year)labels.push(['year',`${state.year}年`]);if(state.terminal)labels.push(['terminal',terminalNames[state.terminal]]);if(state.status)labels.push(['status',statusNames[state.status]]);if(state.sort!=='newest')labels.push(['sort',`排序：${sortNames[state.sort]}`]);if(state.q)labels.push(['q',`搜尋：${state.q}`]);
   $('#activeFilters').innerHTML=labels.map(([key,label])=>`<button type="button" class="filter-chip" data-clear-filter="${key}" aria-label="移除${escapeHtml(label)}篩選">${escapeHtml(label)} <span>×</span></button>`).join('')+(labels.length>1?'<button type="button" class="clear-filters" data-clear-filter="all">清除全部</button>':'');
   document.querySelectorAll('[data-clear-filter]').forEach(button=>button.onclick=()=>clearFilter(button.dataset.clearFilter));
-  const advanced=[state.year,state.terminal,state.status,state.sort!=='newest'].filter(Boolean).length;$('#mobileFilterCount').textContent=advanced?`(${advanced})`:'';
+  const advanced=[state.terminal,state.status].filter(Boolean).length;$('#mobileFilterCount').textContent=advanced?`(${advanced})`:'';
 }
 function clearFilter(key){
   if(key==='all'){state.year='';state.terminal='';state.status='';state.sort='newest';state.q=''}else state[key]=key==='sort'?'newest':'';
@@ -141,6 +141,7 @@ function closeDetail(){const d=$('#detailDialog');if(d.open)d.close();if(locatio
 function bind(){
   $('#filters').onsubmit=e=>{e.preventDefault();state.year=$('#yearFilter').value;state.terminal=$('#terminalFilter').value;state.status=$('#statusFilter').value;state.sort=$('#sortFilter').value;state.q=$('#searchInput').value.trim();state.directId='';state.directOpened=false;state.page=1;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));renderScope();updateYearSelection();renderChips();scrollYearToActive();setFilterDrawer(false);loadAll()};
   $('#scopeToggle').onclick=()=>selectYear(state.year?'':yearRange().latest);
+  const applyVisibleMobileFilter=()=>{if(matchMedia('(max-width:600px)').matches)$('#filters').requestSubmit()};$('#yearFilter').onchange=applyVisibleMobileFilter;$('#sortFilter').onchange=applyVisibleMobileFilter;
   $('#mobileFilterToggle').onclick=()=>setFilterDrawer(true);$('#filterClose').onclick=$('#filterBackdrop').onclick=()=>setFilterDrawer(false);
   $('#closeDialog').onclick=closeDetail;
   $('#mobileCloseDialog').onclick=closeDetail;

@@ -53,14 +53,14 @@
       <form id="filters" class="filters panel">
         <label class="search-label"><span>搜尋警告及原文</span><input id="searchInput" type="search" placeholder="20260718、地區、冰雹、90公里…"></label>
         <button class="mobile-search-submit" type="submit" aria-label="搜尋">搜尋</button>
-        <button id="mobileFilterToggle" class="mobile-filter-toggle" type="button" aria-expanded="false" aria-controls="filterDrawer">篩選 <span id="mobileFilterCount"></span></button>
+        <label class="year-label"><span>年份</span><select id="yearFilter"><option value="">全部年份</option></select></label>
+        <label class="sort-label"><span>排序</span><select id="sortFilter"><option value="newest">最新警告先</option><option value="oldest">最舊警告先</option><option value="duration_desc">有效時間最長先</option><option value="duration_asc">有效時間最短先</option><option value="events_desc">事件最多先</option><option value="cancellation_margin_desc">提早取消幅度最大先</option></select></label>
+        <button id="mobileFilterToggle" class="mobile-filter-toggle" type="button" aria-expanded="false" aria-controls="filterDrawer">更多 <span id="mobileFilterCount"></span></button>
         <button id="filterBackdrop" class="filter-backdrop" type="button" aria-label="關閉篩選"></button>
         <div id="filterDrawer" class="filter-drawer" role="dialog" aria-label="篩選及排序">
-          <div class="filter-drawer-head"><strong>篩選及排序</strong><button id="filterClose" type="button" aria-label="關閉篩選">×</button></div>
-          <label class="year-label"><span>年份</span><select id="yearFilter"><option value="">全部年份</option></select></label>
+          <div class="filter-drawer-head"><strong>更多篩選</strong><button id="filterClose" type="button" aria-label="關閉篩選">×</button></div>
           <label class="terminal-label"><span>終結方式</span><select id="terminalFilter"><option value="">全部結果</option><option value="expired">自然過期</option><option value="cancelled_early">提早取消</option><option value="unknown">無法判斷</option></select></label>
           <label class="status-label"><span>資料完整度</span><select id="statusFilter"><option value="">全部資料</option><option value="available">有天氣稿</option><option value="not_archived">只有警告起訖時間</option><option value="not_downloaded">原始天氣稿暫未下載</option><option value="archive_incomplete">官方 Archive 本身缺漏</option></select></label>
-          <label class="sort-label"><span>排序</span><select id="sortFilter"><option value="newest">最新警告先</option><option value="oldest">最舊警告先</option><option value="duration_desc">有效時間最長先</option><option value="duration_asc">有效時間最短先</option><option value="events_desc">事件最多先</option><option value="cancellation_margin_desc">提早取消幅度最大先</option></select></label>
           <p class="filter-explainer">「只有警告起訖時間」代表沒有對應天氣稿；「官方 Archive 本身缺漏」代表政府索引存在，但原稿未能取得。</p>
           <button class="filter-apply" type="submit">套用篩選 <span>↗</span></button>
         </div>
