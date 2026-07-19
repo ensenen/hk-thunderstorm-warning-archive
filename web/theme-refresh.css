@@ -143,3 +143,13 @@ html[data-mode="light"] footer{background:color-mix(in srgb,var(--surface) 72%,t
 html[data-mode="light"] .theme-picker{box-shadow:0 12px 34px rgba(44,46,65,.16)}
 
 @media(max-width:560px){.theme-picker{right:10px;bottom:10px}.theme-picker-label{display:none}.theme-picker select{max-width:145px}}
+
+/* Keep warning timelines readable on phones: the timestamp sits above the
+   event copy instead of reserving a narrow column down the whole card. */
+@media(max-width:600px){
+  .detail-dialog .event{grid-template-columns:14px minmax(0,1fr);column-gap:10px;row-gap:8px}
+  .detail-dialog .event-time{grid-column:2;grid-row:1;padding-top:0}
+  .detail-dialog .event-dot{grid-column:1;grid-row:1;justify-self:center;margin-top:2px}
+  .detail-dialog .event-content{grid-column:2;grid-row:2;min-width:0}
+  .detail-dialog .event:not(:last-child):before{left:6px;top:14px}
+}

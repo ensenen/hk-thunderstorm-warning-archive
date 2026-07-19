@@ -43,6 +43,8 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn('text-underline-offset:3px', theme)
         self.assertIn('background:var(--text);color:var(--surface)', theme)
         self.assertNotIn('color:#171129', theme)
+        self.assertIn('.detail-dialog .event-time{grid-column:2;grid-row:1', theme)
+        self.assertIn('.detail-dialog .event-content{grid-column:2;grid-row:2', theme)
         picker = self.text("theme.js")
         self.assertIn("prefers-color-scheme", picker)
         self.assertIn("localStorage", picker)
