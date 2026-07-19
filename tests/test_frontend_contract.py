@@ -41,6 +41,8 @@ class FrontendContractTest(unittest.TestCase):
             self.assertIn(colour, theme)
         self.assertIn('html[data-mode="light"] .data-table a', theme)
         self.assertIn('text-underline-offset:3px', theme)
+        self.assertIn('background:var(--text);color:var(--surface)', theme)
+        self.assertNotIn('color:#171129', theme)
         picker = self.text("theme.js")
         self.assertIn("prefers-color-scheme", picker)
         self.assertIn("localStorage", picker)
