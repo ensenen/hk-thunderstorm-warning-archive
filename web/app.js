@@ -106,8 +106,8 @@ function card(s){
     <div class="series-arrow">↗</div></button>`
 }
 function renderPages(d){
-  const pages=[];for(let i=Math.max(1,d.page-2);i<=Math.min(d.pages,d.page+2);i++)pages.push(i);
-  $('#pagination').innerHTML=`<button ${d.page===1?'disabled':''} data-page="${d.page-1}">←</button>${pages[0]>1?'<span class="pagination-ellipsis">…</span>':''}${pages.map(i=>`<button class="${i===d.page?'active':''}" data-page="${i}">${i}</button>`).join('')}${pages.at(-1)<d.pages?'<span class="pagination-ellipsis">…</span>':''}<button ${d.page===d.pages?'disabled':''} data-page="${d.page+1}">→</button>`;
+  let first=Math.max(1,d.page-1),last=Math.min(d.pages,d.page+1);if(d.page<=2)last=Math.min(d.pages,3);if(d.page>=d.pages-1)first=Math.max(1,d.pages-2);const pages=[];for(let i=first;i<=last;i++)pages.push(i);
+  $('#pagination').innerHTML=`<button class="page-edge" aria-label="第一頁" ${d.page===1?'disabled':''} data-page="1"><span class="page-wide">第一頁</span><span class="page-compact">«</span></button><button class="page-step" aria-label="上一頁" ${d.page===1?'disabled':''} data-page="${d.page-1}">←</button>${pages[0]>1?'<span class="pagination-ellipsis">…</span>':''}${pages.map(i=>`<button class="${i===d.page?'active':''}" ${i===d.page?'aria-current="page"':''} data-page="${i}">${i}</button>`).join('')}${pages.at(-1)<d.pages?'<span class="pagination-ellipsis">…</span>':''}<button class="page-step" aria-label="下一頁" ${d.page===d.pages?'disabled':''} data-page="${d.page+1}">→</button><button class="page-edge" aria-label="最後一頁，第 ${d.pages} 頁" ${d.page===d.pages?'disabled':''} data-page="${d.pages}"><span class="page-wide">最後頁</span><span class="page-compact">»</span></button>`;
   document.querySelectorAll('#pagination button:not([disabled])').forEach(b=>b.onclick=()=>{state.page=+b.dataset.page;loadSeries();document.querySelector('.archive-heading').scrollIntoView()});
 }
 function renderChips(){

@@ -56,6 +56,10 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn(".year-section .section-heading>p{display:block", theme)
         self.assertIn(".mobile-detail-toolbar{position:sticky", theme)
         self.assertIn("都盡可能還原成時間線", page)
+        self.assertIn('aria-label="第一頁"', app)
+        self.assertIn('aria-label="最後一頁，第 ${d.pages} 頁"', app)
+        self.assertIn('aria-current="page"', app)
+        self.assertIn('html[data-mode="light"] .pagination button.active', theme)
 
     def test_refreshed_theme_is_loaded_on_every_page(self):
         for page in ("index.html", "evolution.html", "analysis.html"):
