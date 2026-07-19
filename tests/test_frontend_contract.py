@@ -21,9 +21,10 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("延長稿沒有重述原警告的發出時間", app)
         self.assertIn("原文時間疑有筆誤", app)
         self.assertIn("month:'long',day:'numeric'", app)
-        self.assertIn("天氣稿發出：<time", app)
+        self.assertIn("天氣稿發出時間</span><time", app)
         self.assertIn("新有效時間：", app)
         self.assertIn('class="event-heading"', app)
+        self.assertIn('class="event-issued"', app)
         self.assertIn('<time datetime="${e.event_at}">', app)
 
     def test_analysis_ranges_are_data_driven(self):
@@ -88,8 +89,9 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn('background:var(--text);color:var(--surface)', theme)
         self.assertNotIn('color:#171129', theme)
         self.assertIn('.detail-dialog .event{grid-template-columns:18px minmax(0,1fr)', theme)
-        self.assertIn('.event-heading{display:flex', theme)
-        self.assertIn('.event-timing{display:flex', theme)
+        self.assertIn('.event-heading{display:grid', theme)
+        self.assertIn('.event-issued time{display:block;color:var(--cyan)', theme)
+        self.assertIn('.event-valid{display:flex', theme)
         self.assertIn('.detail-dialog{width:100%;max-width:none;height:100dvh', theme)
         toggle = self.text("theme.js")
         self.assertIn("prefers-color-scheme", toggle)
