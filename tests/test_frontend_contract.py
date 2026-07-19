@@ -87,6 +87,9 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("有天氣稿可分析", script)
         self.assertIn("天氣稿刊登時間", script)
         self.assertIn("warningHref(id)", script)
+        self.assertIn("排名</b><strong>警告系列</strong><span>事件數</span><span>延長次數", script)
+        self.assertIn("排名</b><strong>警告系列</strong><span>開始日期</span><span>提早取消幅度", script)
+        self.assertIn("#${i+1}", script)
 
     def test_static_adapter_supports_search_sort_and_details(self):
         adapter = self.text("static-api.js")
