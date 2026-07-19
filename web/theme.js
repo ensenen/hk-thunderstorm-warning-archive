@@ -31,4 +31,15 @@ function installThemeToggle(){
     selected=selected==='paper'?'midnight':'paper';localStorage.setItem(THEME_STORAGE_KEY,selected);applyTheme(selected);describe();
   });
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installThemeToggle);else installThemeToggle();
+function installDataTips(){
+  const tip=document.createElement('div');tip.id='dataTipPopover';tip.className='data-tip-popover';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.append(tip);let active=null;
+  const show=target=>{if(!target?.dataset.tip)return;active=target;tip.textContent=target.dataset.tip;tip.hidden=false;target.setAttribute('aria-describedby',tip.id);requestAnimationFrame(()=>{const rect=target.getBoundingClientRect(),box=tip.getBoundingClientRect(),left=Math.min(innerWidth-box.width-8,Math.max(8,rect.left+(rect.width-box.width)/2)),above=rect.top-box.height-10;tip.style.left=`${left}px`;tip.style.top=`${above>=8?above:Math.min(innerHeight-box.height-8,rect.bottom+10)}px`})};
+  const hide=()=>{active?.removeAttribute('aria-describedby');active=null;tip.hidden=true};
+  document.addEventListener('mouseover',event=>{const target=event.target.closest?.('[data-tip]');if(target&&target!==active)show(target)});
+  document.addEventListener('mouseout',event=>{if(active&&!active.contains(event.relatedTarget))hide()});
+  document.addEventListener('focusin',event=>{const target=event.target.closest?.('[data-tip]');if(target)show(target)});
+  document.addEventListener('focusout',event=>{if(active&&!active.contains(event.relatedTarget))hide()});
+  addEventListener('scroll',hide,{passive:true,capture:true});addEventListener('resize',hide,{passive:true});
+}
+function installUi(){installThemeToggle();installDataTips()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installUi);else installUi();

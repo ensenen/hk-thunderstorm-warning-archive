@@ -14,7 +14,7 @@ async function init(){
 function render(){const terms=payload.terms.filter(t=>category==='全部'||t.category===category);$('#termTimeline').innerHTML=terms.map(termCard).join('')}
 function termCard(term){
   const max=Math.max(1,...term.yearly.map(x=>x.count)),years=new Map(term.yearly.map(x=>[+x.year,x.count])),bars=[];
-  for(let year=payload.archive_start_year;year<=payload.archive_end_year;year++){const count=years.get(year)||0;bars.push(`<i tabindex="0" role="img" aria-label="${year}年，${count}份天氣稿" style="--value:${count/max}" title="${year}：${count}份"></i>`)}
+  for(let year=payload.archive_start_year;year<=payload.archive_end_year;year++){const count=years.get(year)||0,label=`${year}年：${count}份天氣稿`;bars.push(`<i tabindex="0" role="img" aria-label="${label}" data-tip="${label}" style="--value:${count/max}"></i>`)}
   const samples=term.samples.map((sample,index)=>`<article class="word-sample"><div><span>${index?'較近期例子':'最早例子'}</span><time>${dateFmt(sample.bulletin_at)}</time></div><p>${escapeHtml(sample.body_text)}</p><a href="${sample.source_url}" target="_blank" rel="noopener">政府原文 ↗</a></article>`).join('');
   return `<article class="term-card"><div class="term-copy"><div class="term-category">${escapeHtml(term.category)}</div><h3>「${escapeHtml(term.term)}」</h3><p>${escapeHtml(term.description)}</p><div class="term-stats"><strong>${fmt.format(term.count)}</strong>份天氣稿 <span>${term.first_year||'—'} → ${term.last_year||'—'}</span></div></div><div class="term-data"><div class="mini-years">${bars.join('')}</div><div class="year-axis"><span>${payload.archive_start_year}</span><span>2005</span><span>2012</span><span>2019</span><span>${payload.archive_end_year}</span></div><div class="word-samples">${samples}</div></div></article>`;
 }

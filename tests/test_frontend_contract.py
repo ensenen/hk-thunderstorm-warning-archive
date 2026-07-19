@@ -101,6 +101,12 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("排名</b><strong>警告系列</strong><span>事件數</span><span>延長次數", script)
         self.assertIn("排名</b><strong>警告系列</strong><span>開始日期</span><span>提早取消幅度", script)
         self.assertIn("#${i+1}", script)
+        self.assertIn("陣風上限</strong><span>天氣稿日期</span><span>警告系列", script)
+        self.assertIn("代表模板</span><span>首次至最後出現年份</span><strong>稿件數", script)
+        for legend in ("顏色深淺代表警告組數", "年度細柱由左至右排列", "每條直柱代表一年"):
+            self.assertIn(legend, page)
+        self.assertIn('id="coverageAxis"', page)
+        self.assertIn("data-tip", script)
 
     def test_static_adapter_supports_search_sort_and_details(self):
         adapter = self.text("static-api.js")
@@ -113,14 +119,40 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("hashlib.sha256", builder)
         self.assertIn("?v={version}", builder)
 
-    def test_analysis_script_only_targets_existing_elements(self):
+    def test_page_scripts_only_target_existing_elements(self):
         import re
 
-        page = self.text("analysis.html")
-        script = self.text("analysis.js")
-        page_ids = set(re.findall(r'id="([^"]+)"', page))
-        script_ids = set(re.findall(r"\$\('#([^']+)'\)", script))
-        self.assertEqual(script_ids - page_ids, set())
+        for page_name, script_name in (("index.html", "app.js"), ("evolution.html", "evolution.js"), ("analysis.html", "analysis.js")):
+            page_ids = set(re.findall(r'id="([^"]+)"', self.text(page_name)))
+            script_ids = set(re.findall(r"\$\('#([^']+)'\)", self.text(script_name)))
+            self.assertEqual(script_ids - page_ids, set(), f"{script_name} targets missing IDs")
+
+    def test_light_palette_and_hover_data_are_readable(self):
+        import re
+
+        theme = self.text("theme-refresh.css")
+        block = re.search(r'html\[data-theme="paper"\]\{([^}]+)\}', theme).group(1)
+        colours = dict(re.findall(r'--([\w-]+):(#[0-9a-fA-F]{6})', block))
+
+        def luminance(value):
+            channels = [int(value[index:index + 2], 16) / 255 for index in (1, 3, 5)]
+            linear = [channel / 12.92 if channel <= 0.04045 else ((channel + 0.055) / 1.055) ** 2.4 for channel in channels]
+            return sum(weight * channel for weight, channel in zip((0.2126, 0.7152, 0.0722), linear))
+
+        def contrast(first, second):
+            high, low = sorted((luminance(first), luminance(second)), reverse=True)
+            return (high + 0.05) / (low + 0.05)
+
+        for foreground in ("text", "muted", "lime", "cyan", "orange"):
+            self.assertGreaterEqual(contrast(colours[foreground], colours["surface"]), 4.5, foreground)
+        for selector in (".filter-chip", ".badge.available", ".badge.expired", ".badge.historic-time"):
+            self.assertIn(f'html[data-mode="light"] {selector}', theme)
+        self.assertIn('html[data-mode="light"] .brand-mark', theme)
+        self.assertIn('html[data-mode="light"] .filters input::placeholder', theme)
+        self.assertIn(".data-tip-popover", theme)
+        self.assertIn("background:var(--text);color:var(--surface)", theme)
+        self.assertIn("installDataTips", self.text("theme.js"))
+        self.assertIn("data-tip", self.text("evolution.js"))
 
     def test_archive_status_baseline_is_substantial(self):
         payload = json.loads((ROOT / "data/processed/archive-date-status.json").read_text(encoding="utf-8"))
