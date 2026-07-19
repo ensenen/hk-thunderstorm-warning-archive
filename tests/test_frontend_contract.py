@@ -28,8 +28,27 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("analysisEndYear", analysis)
 
     def test_filter_exposes_not_downloaded_state(self):
-        self.assertIn('value="not_downloaded"', self.text("index.html"))
-        self.assertIn('id="sortFilter"', self.text("index.html"))
+        page = self.text("index.html")
+        self.assertIn('value="not_downloaded"', page)
+        self.assertIn('id="sortFilter"', page)
+        self.assertIn('原始天氣稿暫未下載', page)
+        self.assertIn('官方 Archive 本身缺漏', page)
+
+    def test_home_scope_annual_chart_and_mobile_filters(self):
+        page = self.text("index.html")
+        app = self.text("app.js")
+        theme = self.text("theme-refresh.css")
+        for element_id in ("scopeBar", "scopeToggle", "yearSelection", "mobileFilterToggle", "filterDrawer", "mobileCloseDialog"):
+            self.assertIn(f'id="{element_id}"', page)
+        self.assertIn("目前查看：", app)
+        self.assertIn("scrollYearToActive", app)
+        self.assertIn("組有天氣稿", app)
+        self.assertIn("data-clear-filter", app)
+        self.assertIn("clearFilter", app)
+        self.assertIn("setFilterDrawer", app)
+        self.assertIn(".year-section .section-heading>p{display:block", theme)
+        self.assertIn(".mobile-detail-toolbar{position:sticky", theme)
+        self.assertIn("都盡可能還原成時間線", page)
 
     def test_refreshed_theme_is_loaded_on_every_page(self):
         for page in ("index.html", "evolution.html", "analysis.html"):
@@ -46,13 +65,16 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn('.detail-dialog .event-time{grid-column:2;grid-row:1', theme)
         self.assertIn('.detail-dialog .event-content{grid-column:2;grid-row:2', theme)
         self.assertIn('.detail-dialog{width:100%;max-width:none;height:100dvh', theme)
-        picker = self.text("theme.js")
-        self.assertIn("prefers-color-scheme", picker)
-        self.assertIn("localStorage", picker)
-        self.assertIn("['midnight','深色']", picker)
-        self.assertIn("['paper','淺色']", picker)
-        self.assertNotIn("雷達綠光", picker)
-        self.assertNotIn("跟隨系統", picker)
+        toggle = self.text("theme.js")
+        self.assertIn("prefers-color-scheme", toggle)
+        self.assertIn("localStorage", toggle)
+        self.assertIn("['midnight','深色']", toggle)
+        self.assertIn("['paper','淺色']", toggle)
+        self.assertIn("theme-toggle", toggle)
+        self.assertNotIn("theme-picker", toggle)
+        self.assertNotIn("position:fixed", theme[theme.find(".theme-toggle"):theme.find(".theme-toggle") + 300])
+        self.assertNotIn("雷達綠光", toggle)
+        self.assertNotIn("跟隨系統", toggle)
 
     def test_analysis_omits_low_value_cross_warning_panel(self):
         page = self.text("analysis.html")

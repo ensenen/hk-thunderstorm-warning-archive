@@ -1,9 +1,9 @@
-const state={year:'',terminal:'',status:'',sort:'newest',q:'',page:1,pageSize:20,meta:null,directId:'',directOpened:false};
+const state={year:'',terminal:'',status:'',sort:'newest',q:'',page:1,pageSize:20,meta:null,yearly:[],directId:'',directOpened:false};
 const $=s=>document.querySelector(s);
 const fmt=new Intl.NumberFormat('zh-HK');
 const eventNames={issued:'發出',extended:'延長',updated:'內容更新',cancelled:'取消'};
 const terminalNames={expired:'自然過期',cancelled_early:'提早取消',unknown:'無法判斷'};
-const statusNames={available:'有天氣稿',not_archived:'只有官方紀錄',not_downloaded:'尚未下載',archive_incomplete:'Archive缺漏'};
+const statusNames={available:'有天氣稿',not_archived:'只有警告起訖時間',not_downloaded:'原始天氣稿暫未下載',archive_incomplete:'官方 Archive 本身缺漏'};
 const sortNames={newest:'最新警告先',oldest:'最舊警告先',duration_desc:'有效時間最長先',duration_asc:'有效時間最短先',events_desc:'事件最多先',cancellation_margin_desc:'提早取消幅度最大先'};
 const parseWarningNames={
   'explicit-date midnight 12 is date-boundary ambiguous':'原文使用「午夜12時」，所屬日期可能有歧義',
@@ -50,7 +50,7 @@ async function init(){
   const years=state.meta.years.map(row=>row.year);$('#coverageRange').textContent=`${years.at(-1)}—${years[0]}`;
   $('#lastUpdated').textContent=state.meta.source_fetched_at?`資料更新：${dateTimeFmt(state.meta.source_fetched_at)}`:'資料更新時間未能取得';
   const [yearly]=await Promise.all([get('/api/yearly'),loadAll()]);
-  renderYearChart(yearly);
+  state.yearly=yearly;renderYearChart(yearly);renderScope();updateYearSelection();
   bind();
 }
 async function loadAll(){await Promise.all([loadStats(),loadSeries()])}
@@ -65,8 +65,25 @@ async function loadStats(){
 }
 function renderYearChart(data){
   const max=Math.max(...data.map(d=>d.total));
-  $('#yearChart').innerHTML=data.map(d=>`<button class="year-bar ${d.year===state.year?'active':''}" style="--height:${Math.max(3,d.total/max*100)}%;--available:${d.total?d.available/d.total*100:0}%" data-year="${d.year}" aria-label="${d.year}年 ${d.total}組"><span>${d.year} · ${d.total}組</span></button>`).join('');
-  document.querySelectorAll('.year-bar').forEach(b=>b.onclick=()=>{state.year=b.dataset.year;state.page=1;$('#yearFilter').value=state.year;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x===b));loadAll();renderChips();document.querySelector('.archive-section').scrollIntoView()});
+  $('#yearChart').innerHTML=data.map(d=>{const coverage=d.total?d.available/d.total*100:0;return `<button class="year-bar ${d.year===state.year?'active':''}" style="--height:${Math.max(3,d.total/max*100)}%;--available:${coverage}%" data-year="${d.year}" aria-label="${d.year}年，${d.total}組警告，${d.available}組有天氣稿，覆蓋率${coverage.toFixed(1)}%"><span><strong>${d.year}</strong><em>${d.total} 組警告</em><em>${d.available} 組有天氣稿 · ${coverage.toFixed(1)}%</em></span></button>`}).join('');
+  document.querySelectorAll('.year-bar').forEach(b=>b.onclick=()=>{selectYear(b.dataset.year);if(matchMedia('(min-width:901px)').matches)document.querySelector('.archive-section').scrollIntoView()});
+  requestAnimationFrame(()=>scrollYearToActive());
+}
+function yearRange(){const years=state.meta?.years?.map(row=>row.year)||[];return {latest:years[0]||'',earliest:years.at(-1)||''}}
+function renderScope(){
+  const {latest,earliest}=yearRange();if(!latest)return;
+  $('#scopeLabel').textContent=state.year?`目前查看：${state.year} 年警告`:`目前查看：${earliest}–${latest} 全部年份`;
+  $('#scopeToggle').textContent=state.year?`查看全部 ${earliest}–${latest}`:`查看最新 ${latest}`;
+}
+function updateYearSelection(){
+  const row=state.yearly.find(item=>item.year===state.year);
+  $('#yearSelection').innerHTML=row?`<strong>${row.year} 年</strong><span>${fmt.format(row.total)} 組警告</span><span class="available-key">${fmt.format(row.available)} 組有天氣稿</span><span>${row.total?(row.available/row.total*100).toFixed(1):'0.0'}% 覆蓋</span><small>點選年份即可篩選 · 左右滑動查看更多</small>`:`<strong>全部年份</strong><span class="available-key">亮色部分代表有天氣稿</span><small>點選年份即可篩選 · 左右滑動查看更多</small>`;
+}
+function scrollYearToActive(){const chart=$('#yearChart'),active=chart?.querySelector('.year-bar.active');if(!active)return;chart.scrollLeft=Math.max(0,active.offsetLeft-(chart.clientWidth-active.offsetWidth)/2)}
+function selectYear(year){
+  state.year=year||'';state.page=1;state.directId='';state.directOpened=false;$('#yearFilter').value=state.year;
+  document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));
+  renderScope();updateYearSelection();renderChips();scrollYearToActive();loadAll();
 }
 async function loadSeries(){
   $('#seriesList').innerHTML='<div class="loading">正在讀取警告紀錄…</div>';
@@ -93,11 +110,28 @@ function renderPages(d){
   $('#pagination').innerHTML=`<button ${d.page===1?'disabled':''} data-page="${d.page-1}">←</button>${pages[0]>1?'<span class="pagination-ellipsis">…</span>':''}${pages.map(i=>`<button class="${i===d.page?'active':''}" data-page="${i}">${i}</button>`).join('')}${pages.at(-1)<d.pages?'<span class="pagination-ellipsis">…</span>':''}<button ${d.page===d.pages?'disabled':''} data-page="${d.page+1}">→</button>`;
   document.querySelectorAll('#pagination button:not([disabled])').forEach(b=>b.onclick=()=>{state.page=+b.dataset.page;loadSeries();document.querySelector('.archive-heading').scrollIntoView()});
 }
-function renderChips(){const labels=[];if(state.year)labels.push(`${state.year}年`);if(state.terminal)labels.push(terminalNames[state.terminal]);if(state.status)labels.push(statusNames[state.status]);if(state.sort!=='newest')labels.push(`排序：${sortNames[state.sort]}`);if(state.q)labels.push(`搜尋：${escapeHtml(state.q)}`);$('#activeFilters').innerHTML=labels.map(x=>`<span class="filter-chip">${x}</span>`).join('')}
+function renderChips(){
+  const labels=[];if(state.year)labels.push(['year',`${state.year}年`]);if(state.terminal)labels.push(['terminal',terminalNames[state.terminal]]);if(state.status)labels.push(['status',statusNames[state.status]]);if(state.sort!=='newest')labels.push(['sort',`排序：${sortNames[state.sort]}`]);if(state.q)labels.push(['q',`搜尋：${state.q}`]);
+  $('#activeFilters').innerHTML=labels.map(([key,label])=>`<button type="button" class="filter-chip" data-clear-filter="${key}" aria-label="移除${escapeHtml(label)}篩選">${escapeHtml(label)} <span>×</span></button>`).join('')+(labels.length>1?'<button type="button" class="clear-filters" data-clear-filter="all">清除全部</button>':'');
+  document.querySelectorAll('[data-clear-filter]').forEach(button=>button.onclick=()=>clearFilter(button.dataset.clearFilter));
+  const advanced=[state.year,state.terminal,state.status,state.sort!=='newest'].filter(Boolean).length;$('#mobileFilterCount').textContent=advanced?`(${advanced})`:'';
+}
+function clearFilter(key){
+  if(key==='all'){state.year='';state.terminal='';state.status='';state.sort='newest';state.q=''}else state[key]=key==='sort'?'newest':'';
+  state.page=1;state.directId='';state.directOpened=false;
+  $('#yearFilter').value=state.year;$('#terminalFilter').value=state.terminal;$('#statusFilter').value=state.status;$('#sortFilter').value=state.sort;$('#searchInput').value=state.q;
+  document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));renderScope();updateYearSelection();renderChips();scrollYearToActive();loadAll();
+}
+function setFilterDrawer(open){
+  const form=$('#filters'),drawer=$('#filterDrawer'),mobile=matchMedia('(max-width:600px)').matches,visible=mobile&&open;
+  form.classList.toggle('drawer-open',visible);$('#mobileFilterToggle').setAttribute('aria-expanded',String(visible));document.body.classList.toggle('filter-drawer-visible',visible);
+  drawer.inert=mobile&&!visible;if(mobile)drawer.setAttribute('aria-hidden',String(!visible));else drawer.removeAttribute('aria-hidden');if(visible)$('#filterClose').focus();
+}
 async function openDetail(id,updateUrl=false){
   const d=$('#detailDialog');$('#detailContent').innerHTML='<div class="loading">正在建立時間線…</div>';if(!d.open)d.showModal();
   if(updateUrl)history.pushState({seriesId:id},'',detailLocation(id));
   const s=await get(`/api/series/${encodeURIComponent(id)}`);
+  $('#mobileDetailTitle').textContent=`${dateFmt(s.started_at)}雷暴警告`;
   const note=s.weather_bulletin_note?`<div class="detail-note">${escapeHtml(s.weather_bulletin_note)}</div>`:'';
   $('#detailContent').innerHTML=`<div class="detail-header"><p class="eyebrow">${s.id}</p><h2>${dateFmt(s.started_at)}<br>雷暴警告</h2><div class="detail-summary"><span>${dateTimeFmt(s.started_at)} → ${dateTimeFmt(s.ended_at)}</span><span>${duration(s.duration_minutes)}</span><span>${terminalNames[s.terminal_type]}</span><span>${statusNames[s.weather_bulletin_status]}</span></div>${historicTimeNote(s)}${note}</div>
   <div class="timeline">${s.events.length?s.events.map(eventHtml).join(''):`<div class="empty">呢組舊警告只有官方起訖紀錄，沒有天氣稿時間線。<br><a class="source-link" target="_blank" rel="noopener" href="${s.official_source_url}">查看官方資料來源 ↗</a></div>`}</div>`;
@@ -105,9 +139,15 @@ async function openDetail(id,updateUrl=false){
 function eventHtml(e){const until=e.valid_until?`新有效時間 ${dateTimeFmt(e.valid_until)}`:' ';return `<article class="event"><div class="event-time"><small>${shortDateFmt(e.event_at)}</small>${timeFmt(e.event_at)}</div><div class="event-dot"></div><div class="event-content"><h3>${eventNames[e.event_type]||e.event_type}</h3><div class="event-meta">${until}${e.is_correction?' · 更正稿':''}</div><p>${escapeHtml(e.body_text)}</p>${e.parse_warnings?.length?`<div class="detail-note">解析備註：${escapeHtml(e.parse_warnings.map(parseWarningName).join('；'))}</div>`:''}<a class="source-link" href="${e.source_url}" target="_blank" rel="noopener">政府天氣稿原文 ↗</a></div></article>`}
 function closeDetail(){const d=$('#detailDialog');if(d.open)d.close();if(locationSeriesId())history.replaceState({},'',window.THUNDER_STATIC?location.pathname:'/');}
 function bind(){
-  $('#filters').onsubmit=e=>{e.preventDefault();state.year=$('#yearFilter').value;state.terminal=$('#terminalFilter').value;state.status=$('#statusFilter').value;state.sort=$('#sortFilter').value;state.q=$('#searchInput').value.trim();state.directId='';state.directOpened=false;state.page=1;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));loadAll()};
+  $('#filters').onsubmit=e=>{e.preventDefault();state.year=$('#yearFilter').value;state.terminal=$('#terminalFilter').value;state.status=$('#statusFilter').value;state.sort=$('#sortFilter').value;state.q=$('#searchInput').value.trim();state.directId='';state.directOpened=false;state.page=1;document.querySelectorAll('.year-bar').forEach(x=>x.classList.toggle('active',x.dataset.year===state.year));renderScope();updateYearSelection();renderChips();scrollYearToActive();setFilterDrawer(false);loadAll()};
+  $('#scopeToggle').onclick=()=>selectYear(state.year?'':yearRange().latest);
+  $('#mobileFilterToggle').onclick=()=>setFilterDrawer(true);$('#filterClose').onclick=$('#filterBackdrop').onclick=()=>setFilterDrawer(false);
   $('#closeDialog').onclick=closeDetail;
+  $('#mobileCloseDialog').onclick=closeDetail;
   $('#detailDialog').onclick=e=>{if(e.target===$('#detailDialog'))closeDetail()};
+  $('#detailDialog').oncancel=e=>{e.preventDefault();closeDetail()};
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#filters').classList.contains('drawer-open')){e.preventDefault();setFilterDrawer(false)}});
+  const drawerMedia=matchMedia('(max-width:600px)');drawerMedia.addEventListener?.('change',()=>setFilterDrawer(false));setFilterDrawer(false);
   window.onpopstate=()=>{const id=locationSeriesId();if(id){openDetail(id,false)}else if($('#detailDialog').open){$('#detailDialog').close()}};
 }
 init().catch(e=>{$('#seriesList').innerHTML=`<div class="empty">載入失敗：${escapeHtml(e.message)}</div>`;console.error(e)});

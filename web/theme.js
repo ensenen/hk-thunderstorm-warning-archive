@@ -18,17 +18,17 @@ function applyTheme(preference){
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content',colours[resolved]);
   return resolved;
 }
-function installThemePicker(){
+function installThemeToggle(){
   const saved=localStorage.getItem(THEME_STORAGE_KEY)||'';
-  const selected=applyTheme(saved);
-  const label=document.createElement('label');
-  label.className='theme-picker';
-  label.innerHTML=`<span aria-hidden="true">◐</span><span class="theme-picker-label">配色</span><select aria-label="網站配色">${THEME_OPTIONS.map(([id,name])=>`<option value="${id}" ${id===selected?'selected':''}>${name}</option>`).join('')}</select>`;
-  document.body.append(label);
+  let selected=applyTheme(saved);
+  const button=document.createElement('button');
+  button.type='button';button.className='theme-toggle';
+  const describe=()=>{const next=selected==='paper'?'midnight':'paper',name=THEME_OPTIONS.find(([id])=>id===next)?.[1]||next;button.textContent=next==='paper'?'☀':'☾';button.setAttribute('aria-label',`切換至${name}模式`);button.title=`切換至${name}模式`};
+  describe();
+  const nav=document.querySelector('nav');nav?.insertBefore(button,nav.querySelector('.nav-meta'));
   localStorage.setItem(THEME_STORAGE_KEY,selected);
-  label.querySelector('select').addEventListener('change',event=>{
-    localStorage.setItem(THEME_STORAGE_KEY,event.target.value);
-    applyTheme(event.target.value);
+  button.addEventListener('click',()=>{
+    selected=selected==='paper'?'midnight':'paper';localStorage.setItem(THEME_STORAGE_KEY,selected);applyTheme(selected);describe();
   });
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installThemePicker);else installThemePicker();
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installThemeToggle);else installThemeToggle();
