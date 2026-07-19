@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import sqlite3
@@ -62,11 +63,19 @@ def export_series() -> tuple[int, int]:
 
 
 def make_pages_portable() -> None:
-    boot = '<script>window.THUNDER_STATIC=true</script><script src="static-api.js"></script>'
+    asset_versions = {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest()[:10]
+        for pattern in ("*.css", "*.js")
+        for path in OUTPUT.glob(pattern)
+    }
+    boot = f'<script>window.THUNDER_STATIC=true</script><script src="static-api.js?v={asset_versions["static-api.js"]}"></script>'
     for path in OUTPUT.glob("*.html"):
         html = path.read_text(encoding="utf-8")
         html = html.replace('href="/"', 'href="index.html"')
         html = html.replace('href="/', 'href="').replace('src="/', 'src="')
+        for asset, version in asset_versions.items():
+            html = html.replace(f'href="{asset}"', f'href="{asset}?v={version}"')
+            html = html.replace(f'src="{asset}"', f'src="{asset}?v={version}"')
         html = html.replace("</body>", f"{boot}</body>")
         path.write_text(html, encoding="utf-8")
     (OUTPUT / ".nojekyll").write_text("", encoding="utf-8")

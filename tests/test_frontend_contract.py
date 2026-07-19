@@ -110,6 +110,17 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("THUNDER_STATIC", self.text("app.js"))
         builder = (ROOT / "scripts" / "build_static_site.py").read_text(encoding="utf-8")
         self.assertIn("'href=\"/\"', 'href=\"index.html\"'", builder)
+        self.assertIn("hashlib.sha256", builder)
+        self.assertIn("?v={version}", builder)
+
+    def test_analysis_script_only_targets_existing_elements(self):
+        import re
+
+        page = self.text("analysis.html")
+        script = self.text("analysis.js")
+        page_ids = set(re.findall(r'id="([^"]+)"', page))
+        script_ids = set(re.findall(r"\$\('#([^']+)'\)", script))
+        self.assertEqual(script_ids - page_ids, set())
 
     def test_archive_status_baseline_is_substantial(self):
         payload = json.loads((ROOT / "data/processed/archive-date-status.json").read_text(encoding="utf-8"))
