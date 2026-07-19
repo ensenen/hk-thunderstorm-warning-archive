@@ -66,7 +66,7 @@ async function loadStats(){
 function renderYearChart(data){
   const max=Math.max(...data.map(d=>d.total));
   $('#yearChart').innerHTML=data.map(d=>{const coverage=d.total?d.available/d.total*100:0;return `<button class="year-bar ${d.year===state.year?'active':''}" style="--height:${Math.max(3,d.total/max*100)}%;--available:${coverage}%" data-year="${d.year}" aria-label="${d.year}年，${d.total}組警告，${d.available}組有天氣稿，覆蓋率${coverage.toFixed(1)}%"><span><strong>${d.year}</strong><em>${d.total} 組警告</em><em>${d.available} 組有天氣稿 · ${coverage.toFixed(1)}%</em></span></button>`}).join('');
-  document.querySelectorAll('.year-bar').forEach(b=>b.onclick=()=>{selectYear(b.dataset.year);if(matchMedia('(min-width:901px)').matches)document.querySelector('.archive-section').scrollIntoView()});
+  document.querySelectorAll('.year-bar').forEach(b=>b.onclick=()=>{selectYear(b.dataset.year);document.querySelector('.log-heading').scrollIntoView()});
   requestAnimationFrame(()=>scrollYearToActive());
 }
 function yearRange(){const years=state.meta?.years?.map(row=>row.year)||[];return {latest:years[0]||'',earliest:years.at(-1)||''}}
@@ -77,6 +77,9 @@ function renderScope(){
 }
 function updateYearSelection(){
   const row=state.yearly.find(item=>item.year===state.year);
+  const chronological=[...state.yearly].sort((a,b)=>+a.year-+b.year),latest=chronological.at(-1),peak=chronological.reduce((best,item)=>!best||item.total>best.total?item:best,null);
+  if(row){const isCurrent=row.year===latest?.year,previous=chronological[chronological.findIndex(item=>item.year===row.year)-1],change=previous?row.total-previous.total:0,comparison=!isCurrent&&previous?`，較 ${previous.year} 年${change===0?'相同':`${change>0?'多':'少'} ${fmt.format(Math.abs(change))} 組`}`:'';$('#yearInsight').textContent=`${row.year} 年${isCurrent?'暫時':''}錄得 ${fmt.format(row.total)} 組警告${comparison}；${fmt.format(row.available)} 組有天氣稿。`}
+  else $('#yearInsight').textContent=peak?`${chronological[0].year}–${latest.year} 年間，以 ${peak.year} 年最多，共 ${fmt.format(peak.total)} 組警告。`:'';
   $('#yearSelection').innerHTML=row?`<strong>${row.year} 年</strong><span>${fmt.format(row.total)} 組警告</span><span class="available-key">${fmt.format(row.available)} 組有天氣稿</span><span>${row.total?(row.available/row.total*100).toFixed(1):'0.0'}% 覆蓋</span><small>點選年份即可篩選 · 左右滑動查看更多</small>`:`<strong>全部年份</strong><span class="available-key">亮色部分代表有天氣稿</span><small>點選年份即可篩選 · 左右滑動查看更多</small>`;
 }
 function scrollYearToActive(){const chart=$('#yearChart'),active=chart?.querySelector('.year-bar.active');if(!active)return;chart.scrollLeft=Math.max(0,active.offsetLeft-(chart.clientWidth-active.offsetWidth)/2)}
@@ -101,8 +104,8 @@ async function loadSeries(){
 function card(s){
   const teaser=s.first_body||s.weather_bulletin_note||'只有天文台官方起訖紀錄，沒有詳細天氣稿。';
   return `<button class="series-card" data-id="${s.id}">
-    <div><div class="series-time">${timeFmt(s.started_at)} → ${timeFmt(s.ended_at)}</div><div class="series-date">${dateFmt(s.started_at)}</div></div>
-    <div class="series-main"><h3>${duration(s.duration_minutes)}雷暴警告</h3><p>${escapeHtml(teaser)}</p><div class="badges"><span class="badge ${s.terminal_type==='cancelled_early'?'early':s.terminal_type}">${terminalNames[s.terminal_type]}</span><span class="badge ${s.weather_bulletin_status}">${statusNames[s.weather_bulletin_status]}</span><span class="badge">${s.event_count}個事件</span>${s.crosses_day?'<span class="badge">跨日</span>':''}${historicTimeBadge(s)}</div></div>
+    <div class="series-overview"><div class="series-date">${dateFmt(s.started_at)}</div><div class="series-time">${timeFmt(s.started_at)} → ${timeFmt(s.ended_at)}</div><div class="series-duration">${duration(s.duration_minutes)}</div><div class="series-id">${s.id}</div></div>
+    <div class="series-main"><p>${escapeHtml(teaser)}</p><div class="badges"><span class="badge ${s.terminal_type==='cancelled_early'?'early':s.terminal_type}">${terminalNames[s.terminal_type]}</span><span class="badge ${s.weather_bulletin_status}">${statusNames[s.weather_bulletin_status]}</span><span class="badge">${s.event_count}個事件</span>${s.crosses_day?'<span class="badge">跨日</span>':''}${historicTimeBadge(s)}</div></div>
     <div class="series-arrow">↗</div></button>`
 }
 function renderPages(d){

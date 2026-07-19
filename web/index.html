@@ -35,19 +35,9 @@
   </header>
 
   <main>
-    <section class="year-section panel">
-      <div class="section-heading">
-        <div><p class="eyebrow">ANNUAL SIGNAL</p><h2>年度警告密度</h2></div>
-        <p>點選年份即可篩選。亮色部分代表有完整天氣稿。</p>
-      </div>
-      <div id="yearChart" class="year-chart" aria-label="按年警告數目圖表"></div>
-      <div id="yearSelection" class="year-selection" aria-live="polite"></div>
-    </section>
-
     <section class="archive-section">
       <div class="section-heading archive-heading">
-        <div><p class="eyebrow">WARNING LOG</p><h2>警告紀錄</h2></div>
-        <div id="resultCount" class="result-count"></div>
+        <div><p class="eyebrow">LOOK UP A WARNING</p><h2>搜尋警告紀錄</h2><p class="section-deck">由日期、警告編號或者天氣稿內容開始，直接搵返一次警告。</p></div>
       </div>
 
       <form id="filters" class="filters panel">
@@ -67,6 +57,19 @@
       </form>
 
       <div id="activeFilters" class="active-filters"></div>
+
+      <section class="year-section panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">EXPLORE BY YEAR</p><h2>年度警告密度</h2></div>
+          <p>點選年份即可篩選。亮色部分代表有完整天氣稿。</p>
+        </div>
+        <p id="yearInsight" class="year-insight" aria-live="polite"></p>
+        <div id="yearChart" class="year-chart" aria-label="按年警告數目圖表"></div>
+        <div id="yearSelection" class="year-selection" aria-live="polite"></div>
+      </section>
+
+      <div class="log-heading"><div><p class="eyebrow">WARNING LOG</p><h3>符合條件嘅紀錄</h3></div><div id="resultCount" class="result-count"></div></div>
+      <div class="series-columns" aria-hidden="true"><span>日期、時間及時長</span><span>天氣稿摘要及資料狀態</span><span>詳情</span></div>
       <div id="seriesList" class="series-list" aria-live="polite"></div>
       <div id="pagination" class="pagination"></div>
     </section>

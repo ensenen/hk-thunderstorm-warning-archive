@@ -41,8 +41,15 @@ class FrontendContractTest(unittest.TestCase):
         page = self.text("index.html")
         app = self.text("app.js")
         theme = self.text("theme-refresh.css")
-        for element_id in ("scopeBar", "scopeToggle", "yearSelection", "mobileFilterToggle", "filterDrawer", "mobileCloseDialog"):
+        for element_id in ("scopeBar", "scopeToggle", "yearSelection", "yearInsight", "mobileFilterToggle", "filterDrawer", "mobileCloseDialog"):
             self.assertIn(f'id="{element_id}"', page)
+        self.assertLess(page.index('class="archive-section"'), page.index('class="year-section panel"'))
+        self.assertIn("LOOK UP A WARNING", page)
+        self.assertIn('class="series-columns"', page)
+        self.assertIn("日期、時間及時長", page)
+        self.assertIn("series-overview", app)
+        self.assertIn("series-id", app)
+        self.assertIn("較 ${previous.year} 年", app)
         self.assertIn("目前查看：", app)
         self.assertIn("scrollYearToActive", app)
         self.assertIn("組有天氣稿", app)
@@ -95,6 +102,10 @@ class FrontendContractTest(unittest.TestCase):
     def test_analysis_omits_low_value_cross_warning_panel(self):
         page = self.text("analysis.html")
         script = self.text("analysis.js")
+        self.assertIn('class="analysis-guide"', page)
+        for section_id in ("when", "changes", "where", "quality", "audit"):
+            self.assertIn(f'id="{section_id}" class="analysis-section"', page)
+        self.assertIn("section-takeaway", page)
         self.assertNotIn("同時生效嘅其他警告", page)
         self.assertNotIn("overlapStats", page)
         self.assertNotIn("警告系列與觀測雷暴日", page)
