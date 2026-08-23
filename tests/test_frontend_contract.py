@@ -149,6 +149,12 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("if not path.exists():", parser_tests)
         self.assertIn("self.skipTest", parser_tests)
 
+    def test_successful_daily_refresh_triggers_pages_deployment(self):
+        workflow = self.text("../.github/workflows/pages.yml")
+        self.assertIn("workflow_run:", workflow)
+        self.assertIn('workflows: ["Daily data update"]', workflow)
+        self.assertIn("github.event.workflow_run.conclusion == 'success'", workflow)
+
     def test_page_scripts_only_target_existing_elements(self):
         import re
 
