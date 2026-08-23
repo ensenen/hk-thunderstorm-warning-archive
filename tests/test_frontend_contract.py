@@ -144,6 +144,11 @@ class FrontendContractTest(unittest.TestCase):
         self.assertIn("hashlib.sha256", builder)
         self.assertIn("?v={version}", builder)
 
+    def test_parser_fixture_tests_skip_cleanly_in_fresh_checkouts(self):
+        parser_tests = self.text("../tests/test_parse_bulletins.py")
+        self.assertIn("if not path.exists():", parser_tests)
+        self.assertIn("self.skipTest", parser_tests)
+
     def test_page_scripts_only_target_existing_elements(self):
         import re
 
