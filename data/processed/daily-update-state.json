@@ -1,20 +1,20 @@
 {
-  "started_at": "2026-08-28T10:12:28.625315+08:00",
-  "completed_at": "2026-08-28T10:13:02.554086+08:00",
+  "started_at": "2026-08-29T09:47:13.223192+08:00",
+  "completed_at": "2026-08-29T09:47:40.868460+08:00",
   "lookback_days": 2,
   "downloads": [
-    {
-      "date": "2026-08-27",
-      "index_status": 200,
-      "bulletins": 8,
-      "warning_links": 8,
-      "errors": []
-    },
     {
       "date": "2026-08-28",
       "index_status": 200,
       "bulletins": 4,
       "warning_links": 4,
+      "errors": []
+    },
+    {
+      "date": "2026-08-29",
+      "index_status": 200,
+      "bulletins": 1,
+      "warning_links": 1,
       "errors": []
     }
   ]
