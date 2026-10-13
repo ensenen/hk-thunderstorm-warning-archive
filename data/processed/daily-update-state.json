@@ -1,17 +1,17 @@
 {
-  "started_at": "2026-10-13T08:49:44.290300+08:00",
-  "completed_at": "2026-10-13T08:49:59.388186+08:00",
+  "started_at": "2026-10-14T06:54:41.839450+08:00",
+  "completed_at": "2026-10-14T06:54:58.726012+08:00",
   "lookback_days": 2,
   "downloads": [
     {
-      "date": "2026-10-12",
+      "date": "2026-10-13",
       "index_status": 200,
       "bulletins": 0,
       "warning_links": 0,
       "errors": []
     },
     {
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "index_status": 200,
       "bulletins": 0,
       "warning_links": 0,
